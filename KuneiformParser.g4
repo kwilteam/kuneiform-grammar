@@ -9,29 +9,25 @@ options {
     tokenVocab=KuneiformLexer;
 }
 
-sourceUnit:// databaseSpec then table or action declarations
-    (database_directive | table_decl | action_decl)* EOF
+source_unit:// databaseSpec then table or action declarations
+    database_directive SCOL
+    (table_decl | action_decl)*
+    EOF
+//    (database_directive | table_decl | action_decl)* EOF
 ;
 
-database_directive: DATABASE_ IDENTIFIER SCOL;
+database_directive: DATABASE_ database_name;
 
 //directive: // a sentence that is informative, setting global state
 //;
-
-declaration: // a sentence that declare a type of structure, not actually execute anything
-    table_decl | action_decl
-;
 
 table_decl:
     TABLE_ table_name
     L_BRACE
     column_def_list
     (COMMA index_def_list)?
+    COMMA? // optional comma
     R_BRACE
-;
-
-table_name:
-    IDENTIFIER
 ;
 
 column_def:
@@ -42,14 +38,6 @@ column_def_list:
     column_def (COMMA column_def)*
 ;
 
-column_name:
-    IDENTIFIER
-;
-
-column_name_list:
-    column_name (COMMA column_name)*
-;
-
 column_type:
     INT_
     | TEXT_
@@ -57,18 +45,27 @@ column_type:
 
 column_constraint:
     PRIMARY_
-    | DEFAULT_ L_PAREN (STRING_LITERAL | UNSIGNED_NUMBER_LITERAL) R_PAREN
-    | MIN_ L_PAREN UNSIGNED_NUMBER_LITERAL R_PAREN
-    | MAX_ L_PAREN UNSIGNED_NUMBER_LITERAL R_PAREN
-    | MIN_LEN_ L_PAREN UNSIGNED_NUMBER_LITERAL R_PAREN
-    | MAX_LEN_ L_PAREN UNSIGNED_NUMBER_LITERAL R_PAREN
     | NOT_NULL_
     | UNIQUE_
+    | DEFAULT_ L_PAREN literal_value R_PAREN
+    | MIN_ L_PAREN number_value R_PAREN
+    | MAX_ L_PAREN number_value R_PAREN
+    | MIN_LEN_ L_PAREN number_value R_PAREN
+    | MAX_LEN_ L_PAREN number_value R_PAREN
+;
+
+literal_value:
+    STRING_LITERAL
+    | UNSIGNED_NUMBER_LITERAL
+;
+
+number_value:
+    UNSIGNED_NUMBER_LITERAL
 ;
 
 index_def:
-    INDEX_NAME
-    (UNIQUE_ | INDEX_)
+    index_name
+    (UNIQUE_ | INDEX_ | PRIMARY_)
     L_PAREN column_name_list R_PAREN
 ;
 
@@ -89,23 +86,44 @@ action_param_list:
     ACTION_PARAMETER? (COMMA ACTION_PARAMETER)*
 ;
 
+database_name:
+    IDENTIFIER
+;
+
+table_name:
+    IDENTIFIER
+;
+
 action_name:
     IDENTIFIER
 ;
 
-action_stmt:
-    sql_stmt
+column_name:
+    IDENTIFIER
+;
+
+column_name_list:
+    column_name (COMMA column_name)*
+;
+
+index_name:
+    INDEX_NAME
 ;
 
 sql_keywords:
     SELECT_
     | INSERT_
     | UPDATE_
+    | DELETE_
     | WITH_
 ;
 
 sql_stmt:
-    sql_keywords S_RAW_SQL SQL_END
+    sql_keywords SQL_STMT SQL_END_SCOL
+;
+
+action_stmt:
+    sql_stmt
 ;
 
 action_stmt_list:

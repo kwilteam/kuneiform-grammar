@@ -36,11 +36,12 @@ PRIMARY_:  'primary';
 DEFAULT_:  'default';
 UNIQUE_:   'unique';
 INDEX_:    'index';
-//// sql stmt type
-SELECT_:   [sS][eE][lL][eE][cC][tT] -> mode(SQL);
-INSERT_:   [iI][nN][sS][eE][rR][tT] -> mode(SQL);
-UPDATE_:   [uU][pP][dD][aA][tT][eE] -> mode(SQL);
-WITH_:     [wW][iI][tT][hH]         -> mode(SQL);
+//// switch to SQL_MODE
+SELECT_:   [sS][eE][lL][eE][cC][tT] -> mode(SQL_MODE);
+INSERT_:   [iI][nN][sS][eE][rR][tT] -> mode(SQL_MODE);
+UPDATE_:   [uU][pP][dD][aA][tT][eE] -> mode(SQL_MODE);
+DELETE_:   [dD][eE][lL][eE][tT][eE] -> mode(SQL_MODE);
+WITH_:     [wW][iI][tT][hH]         -> mode(SQL_MODE);
 
 
 // literals
@@ -82,8 +83,8 @@ fragment SINGLE_QUOTE_STRING: '\'' SINGLE_QUOTE_STRING_CHAR* '\'';
 
 
 // ----------------- Everything Follows a SQL keyword ---------------------
-mode SQL;
-SQL_END: SCOL -> mode(DEFAULT_MODE);
-S_NL: [ \t\r\n]+ -> skip;
-S_RAW_SQL: ~[;]+;
+mode SQL_MODE;
+SQL_END_SCOL: SCOL -> mode(DEFAULT_MODE);
+SQL_NL: [ \t\r\n]+ -> skip;
+SQL_STMT: ~[;]+;
 
