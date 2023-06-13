@@ -3,6 +3,7 @@
 set -e
 
 target=${1:-Go}
+package=${2:-kfgrammar}
 
 antlr_bin=antlr-4.12.0-complete.jar
 
@@ -12,4 +13,4 @@ if [ ! -f $antlr_bin ]; then
 fi
 
 alias antlr4='java -Xmx500M -cp "./${antlr_bin}:$CLASSPATH" org.antlr.v4.Tool'
-antlr4 -Dlanguage="${target}" -visitor -no-listener -package kf_grammar *.g4
+antlr4 -Dlanguage="${target}" -visitor -no-listener -package "${package}" *.g4
