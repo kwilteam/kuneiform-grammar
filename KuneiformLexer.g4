@@ -36,6 +36,17 @@ PRIMARY_:  'primary';
 DEFAULT_:  'default';
 UNIQUE_:   'unique';
 INDEX_:    'index';
+//// foreign key
+FOREIGN_KEY_:           'foreign_key';
+REFERENCES_:            'references';
+ACTION_ON_UPDATE_:      'on_update';
+ACTION_ON_DELETE_:      'on_delete';
+ACTION_DO_:             'do';
+ACTION_DO_NO_ACTION_:   'no_action';
+ACTION_DO_CASCADE_:     'cascade';
+ACTION_DO_SET_NULL_:    'set_null';
+ACTION_DO_SET_DEFAULT_: 'set_default';
+ACTION_DO_RESTRICT_:    'restrict';
 //// switch to SQL_MODE
 SELECT_:   [sS][eE][lL][eE][cC][tT] -> mode(SQL_MODE);
 INSERT_:   [iI][nN][sS][eE][rR][tT] -> mode(SQL_MODE);

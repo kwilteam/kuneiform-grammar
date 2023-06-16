@@ -26,6 +26,7 @@ table_decl:
     L_BRACE
     column_def_list
     (COMMA index_def_list)?
+    (COMMA foreign_key_def_list)?
     COMMA? // optional comma
     R_BRACE
 ;
@@ -71,6 +72,28 @@ index_def:
 
 index_def_list:
     index_def (COMMA index_def)*
+;
+
+foreign_key_action:
+    (ACTION_ON_UPDATE_ | ACTION_ON_DELETE_)
+    ACTION_DO_
+    (ACTION_DO_NO_ACTION_
+    | ACTION_DO_RESTRICT_
+    | ACTION_DO_SET_NULL_
+    | ACTION_DO_SET_DEFAULT_
+    | ACTION_DO_CASCADE_)
+;
+
+foreign_key_def:
+    FOREIGN_KEY_
+    L_PAREN column_name_list R_PAREN
+    REFERENCES_ table_name
+    L_PAREN column_name_list R_PAREN
+    foreign_key_action*
+;
+
+foreign_key_def_list:
+    foreign_key_def (COMMA foreign_key_def)*
 ;
 
 action_decl:
