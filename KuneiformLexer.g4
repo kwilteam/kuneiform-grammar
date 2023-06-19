@@ -6,19 +6,20 @@
 lexer grammar KuneiformLexer;
 
 // symbols
+COL:       ':';
 SCOL:      ';';
 L_PAREN:   '(';
 L_BRACE:   '{';
 R_PAREN:   ')';
 R_BRACE:   '}';
 COMMA:     ',';
-PERIOD:    '.';
 DOLLAR:    '$';
-AT:        '@';
 HASH:      '#';
 
 // keywords
 DATABASE_: 'database';
+USE_:      'use';
+AS_:       'as';
 TABLE_:    'table';
 ACTION_:   'action';
 PUBLIC_:   'public';
@@ -49,21 +50,24 @@ ACTION_DO_CASCADE_:     'cascade';
 ACTION_DO_SET_NULL_:    'set_null';
 ACTION_DO_SET_DEFAULT_: 'set_default';
 ACTION_DO_RESTRICT_:    'restrict';
-//// switch to SQL_MODE
-SELECT_:   [sS][eE][lL][eE][cC][tT] -> mode(SQL_MODE);
-INSERT_:   [iI][nN][sS][eE][rR][tT] -> mode(SQL_MODE);
-UPDATE_:   [uU][pP][dD][aA][tT][eE] -> mode(SQL_MODE);
-DELETE_:   [dD][eE][lL][eE][tT][eE] -> mode(SQL_MODE);
-WITH_:     [wW][iI][tT][hH]         -> mode(SQL_MODE);
+// sql keywords (make it top level keywords)
+SELECT_:   [sS][eE][lL][eE][cC][tT];
+INSERT_:   [iI][nN][sS][eE][rR][tT];
+UPDATE_:   [uU][pP][dD][aA][tT][eE];
+DELETE_:   [dD][eE][lL][eE][tT][eE];
+WITH_:     [wW][iI][tT][hH]        ;
 
+//// switch to ACTION_MODE
+ACTION_OPEN_PUBLIC: PUBLIC_ WSNL L_BRACE -> mode(ACTION_MODE);
+ACTION_OPEN_PRIVATE: PRIVATE_ WSNL L_BRACE -> mode(ACTION_MODE);
 
 // literals
 IDENTIFIER:
     [a-zA-Z] [a-zA-Z_0-9]*
 ;
 
-INDEX_NAME: '#' IDENTIFIER;
-ACTION_PARAMETER: '$' IDENTIFIER;
+INDEX_NAME: HASH IDENTIFIER;
+PARAMETER: DOLLAR IDENTIFIER;
 
 UNSIGNED_NUMBER_LITERAL:
     DIGIT+
@@ -83,9 +87,8 @@ TERMINATOR:    [\r\n]+       -> channel(HIDDEN);
 BLOCK_COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
 LINE_COMMENT:  '//' ~[\r\n]* -> channel(HIDDEN);
 
-UNEXPECTED_CHAR: .;
-
 // fragments
+fragment WSNL: [ \t\r\n]+; // whitespace with new line
 fragment DIGIT: [0-9];
 
 fragment DOUBLE_QUOTE_STRING_CHAR: ~["\r\n\\] | ('\\' .);
@@ -95,9 +98,36 @@ fragment DOUBLE_QUOTE_STRING: '"' DOUBLE_QUOTE_STRING_CHAR* '"';
 fragment SINGLE_QUOTE_STRING: '\'' SINGLE_QUOTE_STRING_CHAR* '\'';
 
 
-// ----------------- Everything Follows a SQL keyword ---------------------
-mode SQL_MODE;
-SQL_END_SCOL: SCOL -> mode(DEFAULT_MODE);
-SQL_NL: [ \t\r\n]+ -> skip;
-SQL_STMT: ~[;]+;
+// ----------------- ACTION_MODE -----------------
+mode ACTION_MODE;
+ACTION_CLOSE: R_BRACE -> mode(DEFAULT_MODE);
 
+EQ:         '=';
+PLUS:       '+';
+PERIOD:     '.';
+A_COMMA:    COMMA;
+A_DOLLAR:   DOLLAR;
+A_AT:       '@';
+A_L_PAREN:  L_PAREN;
+A_R_PAREN:  R_PAREN;
+A_STMT_END: SCOL;
+
+SQL_KEYWORDS: SELECT_ | INSERT_ | UPDATE_ | DELETE_ | WITH_;
+
+A_IDENTIFIER: IDENTIFIER;
+A_VARIABLE: A_DOLLAR A_IDENTIFIER;
+A_REF: A_AT A_IDENTIFIER;
+A_UNSIGNED_NUMBER_LITERAL: UNSIGNED_NUMBER_LITERAL;
+A_SIGNED_NUMBER_LITERAL: SIGNED_NUMBER_LITERAL;
+A_STRING_LITERAL: STRING_LITERAL;
+
+// we only need sql statement as a whole, sql-parser will parse it
+A_SQL_STMT: SQL_KEYWORDS ~[;}]+;
+
+A_WS:            WS -> skip;
+A_TERMINATOR:    TERMINATOR -> skip;
+A_BLOCK_COMMENT: BLOCK_COMMENT -> channel(HIDDEN);
+A_LINE_COMMENT:  LINE_COMMENT -> channel(HIDDEN);
+
+// if not enforce syntax on call stmt, use this for action_stmt instead
+//ACTION_STMT: ~[;}]+;
