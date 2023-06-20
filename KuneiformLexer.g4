@@ -38,7 +38,9 @@ UNIQUE_:   'unique';
 INDEX_:    'index';
 //// foreign key
 FOREIGN_KEY_:           'foreign_key';
+FOREIGN_KEY_ABBR_:      'fk';
 REFERENCES_:            'references';
+REFERENCES_ABBR_:       'ref';
 ACTION_ON_UPDATE_:      'on_update';
 ACTION_ON_DELETE_:      'on_delete';
 ACTION_DO_:             'do';
