@@ -76,7 +76,7 @@ index_def_list:
 
 foreign_key_action:
     (ACTION_ON_UPDATE_ | ACTION_ON_DELETE_)
-    ACTION_DO_
+    ACTION_DO_?
     (ACTION_DO_NO_ACTION_
     | ACTION_DO_RESTRICT_
     | ACTION_DO_SET_NULL_
@@ -85,9 +85,10 @@ foreign_key_action:
 ;
 
 foreign_key_def:
-    FOREIGN_KEY_
+    (FOREIGN_KEY_ | FOREIGN_KEY_ABBR_)
     L_PAREN column_name_list R_PAREN
-    REFERENCES_ table_name
+    (REFERENCES_ | REFERENCES_ABBR_)
+    table_name
     L_PAREN column_name_list R_PAREN
     foreign_key_action*
 ;
