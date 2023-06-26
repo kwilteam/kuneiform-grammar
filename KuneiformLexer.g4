@@ -24,6 +24,7 @@ TABLE_:    'table';
 ACTION_:   'action';
 PUBLIC_:   'public';
 PRIVATE_:  'private';
+INIT_:     'init';
 //// column type
 INT_:      'int';
 TEXT_:     'text';
@@ -58,8 +59,10 @@ DELETE_:   [dD][eE][lL][eE][tT][eE];
 WITH_:     [wW][iI][tT][hH]        ;
 
 //// switch to ACTION_MODE
-ACTION_OPEN_PUBLIC: PUBLIC_ WSNL L_BRACE -> mode(ACTION_MODE);
-ACTION_OPEN_PRIVATE: PRIVATE_ WSNL L_BRACE -> mode(ACTION_MODE);
+ACTION_OPEN_PUBLIC: PUBLIC_ WSNL* L_BRACE -> mode(ACTION_MODE);
+ACTION_OPEN_PRIVATE: PRIVATE_ WSNL* L_BRACE -> mode(ACTION_MODE);
+INIT_OPEN: INIT_ WSNL* L_PAREN WSNL* R_PAREN WSNL* L_BRACE -> mode(ACTION_MODE);
+
 
 // literals
 IDENTIFIER:
@@ -82,13 +85,13 @@ STRING_LITERAL:
     | SINGLE_QUOTE_STRING
 ;
 
-WS:            [ \t]+        -> channel(HIDDEN);
-TERMINATOR:    [\r\n]+       -> channel(HIDDEN);
+WS:            [ \t]        -> channel(HIDDEN);
+TERMINATOR:    [\r\n]       -> channel(HIDDEN);
 BLOCK_COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
 LINE_COMMENT:  '//' ~[\r\n]* -> channel(HIDDEN);
 
 // fragments
-fragment WSNL: [ \t\r\n]+; // whitespace with new line
+fragment WSNL: [ \t\r\n]; // whitespace with new line
 fragment DIGIT: [0-9];
 
 fragment DOUBLE_QUOTE_STRING_CHAR: ~["\r\n\\] | ('\\' .);
@@ -124,8 +127,8 @@ A_STRING_LITERAL: STRING_LITERAL;
 // we only need sql statement as a whole, sql-parser will parse it
 A_SQL_STMT: SQL_KEYWORDS ~[;}]+;
 
-A_WS:            WS -> skip;
-A_TERMINATOR:    TERMINATOR -> skip;
+A_WS:            WS -> channel(HIDDEN);
+A_TERMINATOR:    TERMINATOR -> channel(HIDDEN);
 A_BLOCK_COMMENT: BLOCK_COMMENT -> channel(HIDDEN);
 A_LINE_COMMENT:  LINE_COMMENT -> channel(HIDDEN);
 

@@ -12,9 +12,8 @@ options {
 source_unit:// databaseSpec then table or action declarations
     database_directive SCOL
     (extension_directive)*
-    (table_decl | action_decl)*
+    (table_decl | action_decl | init_decl)*
     EOF
-//    (database_directive | table_decl | action_decl)* EOF
 ;
 
 database_directive: DATABASE_ database_name;
@@ -32,9 +31,6 @@ ext_config_list:
 ext_config:
     ext_config_name COL ext_config_value
 ;
-
-//directive: // a sentence that is informative, setting global state
-//;
 
 table_decl:
     TABLE_ table_name
@@ -149,6 +145,13 @@ index_name:
 
 ext_config_value:
     literal_value
+;
+
+// parsed as action
+init_decl:
+    INIT_OPEN
+    action_stmt_list
+    ACTION_CLOSE
 ;
 
 // --------- action statements ---------
