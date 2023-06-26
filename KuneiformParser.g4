@@ -25,8 +25,7 @@ table_decl:
     TABLE_ table_name
     L_BRACE
     column_def_list
-    (COMMA index_def_list)?
-    (COMMA foreign_key_def_list)?
+    (COMMA (index_def | foreign_key_def))*
     COMMA? // optional comma
     R_BRACE
 ;
@@ -70,10 +69,6 @@ index_def:
     L_PAREN column_name_list R_PAREN
 ;
 
-index_def_list:
-    index_def (COMMA index_def)*
-;
-
 foreign_key_action:
     (ACTION_ON_UPDATE_ | ACTION_ON_DELETE_)
     ACTION_DO_?
@@ -91,10 +86,6 @@ foreign_key_def:
     table_name
     L_PAREN column_name_list R_PAREN
     foreign_key_action*
-;
-
-foreign_key_def_list:
-    foreign_key_def (COMMA foreign_key_def)*
 ;
 
 action_decl:
