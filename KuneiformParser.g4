@@ -102,7 +102,7 @@ foreign_key_def:
 action_decl:
     ACTION_ action_name
     L_PAREN param_list R_PAREN
-    (ACTION_OPEN_PUBLIC | ACTION_OPEN_PRIVATE)
+    ACTION_OPEN
     action_stmt_list
     ACTION_CLOSE
 ;
