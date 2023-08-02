@@ -25,6 +25,7 @@ ACTION_:   'action';
 PUBLIC_:   'public';
 PRIVATE_:  'private';
 VIEW_:     'view';
+MUSTSIGN_: 'mustsign';
 INIT_:     'init';
 //// column type
 INT_:      'int';
@@ -60,7 +61,7 @@ DELETE_:   [dD][eE][lL][eE][tT][eE];
 WITH_:     [wW][iI][tT][hH]        ;
 
 //// switch to ACTION_MODE
-ACTION_OPEN: (PUBLIC_|PRIVATE_) (WSNL+ VIEW_)? WSNL* L_BRACE -> mode(ACTION_MODE);
+ACTION_OPEN: (PUBLIC_|PRIVATE_) (WSNL+ VIEW_ WSNL+ MUSTSIGN_?)? WSNL* L_BRACE -> mode(ACTION_MODE);
 INIT_OPEN: INIT_ WSNL* L_PAREN WSNL* R_PAREN WSNL* L_BRACE -> mode(ACTION_MODE);
 
 // literals
