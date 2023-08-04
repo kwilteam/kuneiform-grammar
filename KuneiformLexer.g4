@@ -21,12 +21,13 @@ DATABASE_: 'database';
 USE_:      'use';
 AS_:       'as';
 TABLE_:    'table';
+INIT_:     'init';
 ACTION_:   'action';
 PUBLIC_:   'public';
 PRIVATE_:  'private';
 VIEW_:     'view';
 MUSTSIGN_: 'mustsign';
-INIT_:     'init';
+OWNER_:    'owner';
 //// column type
 INT_:      'int';
 TEXT_:     'text';
@@ -60,9 +61,6 @@ UPDATE_:   [uU][pP][dD][aA][tT][eE];
 DELETE_:   [dD][eE][lL][eE][tT][eE];
 WITH_:     [wW][iI][tT][hH]        ;
 
-//// switch to ACTION_MODE
-ACTION_OPEN: (PUBLIC_|PRIVATE_) (WSNL+ VIEW_ WSNL+ MUSTSIGN_?)? WSNL* L_BRACE -> mode(ACTION_MODE);
-INIT_OPEN: INIT_ WSNL* L_PAREN WSNL* R_PAREN WSNL* L_BRACE -> mode(ACTION_MODE);
 
 // literals
 IDENTIFIER:
@@ -90,6 +88,22 @@ TERMINATOR:    [\r\n]       -> channel(HIDDEN);
 BLOCK_COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
 LINE_COMMENT:  '//' ~[\r\n]* -> channel(HIDDEN);
 
+// Switch to ACTION_ATTR_MODE
+// The mode switching path will be: DEFAULT_MODE -> ACTION_ATTR_MODE -> ACTION_MODE -> DEFAULT_MODE.
+// Since `{` is not unique to action, we can only rely on `action` to trigger the mode switch.
+// There are two ways to switch to ACTION_MODE:
+// a. match `action_attr_keyword REGEX {` and switch to ACTION_MODE
+// b. put `REGEX` in a. into another mode, then trigger the mode switch by matching `{` to ACTION_MODE
+//    (this is what we do here)
+// This way we can enforce syntax both on action attributes and action statements.
+// This is better than prious solution, but still not perfect.There must be a keyword to switch to ACTION_MODE,
+// i think we can live with it.
+// A potentional solution is make the first action attribute mandatory, maybe it's not a good idea.
+ACTION_ATTR_START: (PUBLIC_|PRIVATE_|VIEW_|MUSTSIGN_|OWNER_) WSNL* -> mode(ACTION_ATTR_MODE);
+// switch to ACTION_MODE
+// init is eaiser to match than action, we can directly switch to ACTION_MODE
+INIT_OPEN: INIT_ WSNL* L_PAREN WSNL* R_PAREN WSNL* L_BRACE -> mode(ACTION_MODE);
+
 // fragments
 fragment WSNL: [ \t\r\n]; // whitespace with new line
 fragment DIGIT: [0-9];
@@ -99,6 +113,22 @@ fragment SINGLE_QUOTE_STRING_CHAR: ~['\r\n\\] | ('\\' .);
 
 fragment DOUBLE_QUOTE_STRING: '"' DOUBLE_QUOTE_STRING_CHAR* '"';
 fragment SINGLE_QUOTE_STRING: '\'' SINGLE_QUOTE_STRING_CHAR* '\'';
+
+
+// ----------------- ACTION_ATTR_MODE -----------------
+// in this mode, we only match the action attributes
+mode ACTION_ATTR_MODE;
+
+AA_PUBLIC_: PUBLIC_;
+AA_PRIVATE_: PRIVATE_;
+AA_VIEW_: VIEW_;
+AA_MUSTSIGN_: MUSTSIGN_;
+AA_OWNER_: OWNER_;
+
+AA_WS:            WS -> channel(HIDDEN);
+AA_TERMINATOR:    TERMINATOR -> channel(HIDDEN);
+
+ACTION_ATTR_END: L_BRACE -> mode(ACTION_MODE);
 
 
 // ----------------- ACTION_MODE -----------------

@@ -99,10 +99,19 @@ foreign_key_def:
     foreign_key_action*
 ;
 
+action_attr:
+    AA_PUBLIC_
+    | AA_PRIVATE_
+    | AA_VIEW_
+    | AA_MUSTSIGN_
+    | AA_OWNER_
+//    | AA_IDENT // for future modifier
+;
+
 action_decl:
     ACTION_ action_name
     L_PAREN param_list R_PAREN
-    ACTION_OPEN
+    ACTION_ATTR_START action_attr* ACTION_ATTR_END
     action_stmt_list
     ACTION_CLOSE
 ;
