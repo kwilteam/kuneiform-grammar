@@ -99,16 +99,38 @@ foreign_key_def:
     foreign_key_action*
 ;
 
+action_visibility:
+    PUBLIC_
+    | PRIVATE_
+;
+
+action_mutability:
+    VIEW_
+;
+
+action_auxiliary:
+    MUSTSIGN_
+;
+
+action_attr_list:
+    (action_visibility | action_mutability | action_auxiliary)*
+;
+
 action_decl:
     ACTION_ action_name
     L_PAREN param_list R_PAREN
-    ACTION_OPEN
+    action_attr_list
+    L_BRACE
     action_stmt_list
-    ACTION_CLOSE
+    R_BRACE
 ;
 
 param_list:
-    PARAMETER? (COMMA PARAMETER)*
+    parameter? (COMMA parameter)*
+;
+
+parameter:
+    PARAM_OR_VAR
 ;
 
 database_name:
@@ -149,63 +171,62 @@ ext_config_value:
 
 // parsed as action
 init_decl:
-    INIT_OPEN
+    INIT_
+    L_PAREN R_PAREN
+    L_BRACE
     action_stmt_list
-    ACTION_CLOSE
+    R_BRACE
 ;
-
-// --------- action statements ---------
-// only for enforing syntax, won't actually parse
 
 action_stmt_list:
     action_stmt+
 ;
 
 action_stmt:
-    a_sql_stmt
-    | a_call_stmt
+    sql_stmt
+    | call_stmt
 ;
 
-a_sql_stmt:
-    A_SQL_STMT A_STMT_END
+sql_stmt:
+    SQL_STMT SCOL
 ;
 
-a_variable_name:
-    A_VARIABLE
+variable:
+    PARAM_OR_VAR
 ;
 
-a_block_variable_name:
-    A_REF
+block_var:
+    BLOCK_VAR
 ;
 
-a_literal_value:
-    A_STRING_LITERAL
-    | A_UNSIGNED_NUMBER_LITERAL
+ext_call_name:
+    IDENTIFIER (PERIOD IDENTIFIER)?
 ;
 
-a_fn_name:
-    A_IDENTIFIER (PERIOD A_IDENTIFIER)?
+callee_name:
+    ext_call_name
+    | action_name
 ;
 
-a_call_receivers:
-    a_variable_name (A_COMMA a_variable_name)*
+call_receivers:
+    variable (COMMA variable)*
 ;
 
-a_call_stmt:
-    (a_call_receivers EQ)?
-    a_call_body  A_STMT_END
+call_stmt:
+    (call_receivers EQ)?
+    call_body SCOL
 ;
 
-a_call_body:
-    a_fn_name A_L_PAREN a_fn_arg_list A_R_PAREN
+call_body:
+    callee_name L_PAREN fn_arg_list R_PAREN
 ;
 
-a_fn_arg_list:
-    a_fn_arg? (A_COMMA a_fn_arg)*
+fn_arg_list:
+    fn_arg? (COMMA fn_arg)*
 ;
 
-a_fn_arg:
-    a_literal_value
-    | a_variable_name
-    | a_block_variable_name
+fn_arg:
+    literal_value
+    | variable
+    | block_var
 ;
