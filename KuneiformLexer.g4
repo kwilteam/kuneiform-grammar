@@ -15,6 +15,9 @@ R_BRACE:   '}';
 COMMA:     ',';
 DOLLAR:    '$';
 HASH:      '#';
+AT:        '@';
+PERIOD:    '.';
+EQ:        '=';
 
 // keywords
 DATABASE_: 'database';
@@ -22,11 +25,11 @@ USE_:      'use';
 AS_:       'as';
 TABLE_:    'table';
 ACTION_:   'action';
+INIT_:     'init';
 PUBLIC_:   'public';
 PRIVATE_:  'private';
 VIEW_:     'view';
 MUSTSIGN_: 'mustsign';
-INIT_:     'init';
 //// column type
 INT_:      'int';
 TEXT_:     'text';
@@ -60,17 +63,14 @@ UPDATE_:   [uU][pP][dD][aA][tT][eE];
 DELETE_:   [dD][eE][lL][eE][tT][eE];
 WITH_:     [wW][iI][tT][hH]        ;
 
-//// switch to ACTION_MODE
-ACTION_OPEN: (PUBLIC_|PRIVATE_) (WSNL+ VIEW_ WSNL+ MUSTSIGN_?)? WSNL* L_BRACE -> mode(ACTION_MODE);
-INIT_OPEN: INIT_ WSNL* L_PAREN WSNL* R_PAREN WSNL* L_BRACE -> mode(ACTION_MODE);
-
 // literals
 IDENTIFIER:
     [a-zA-Z] [a-zA-Z_0-9]*
 ;
 
 INDEX_NAME: HASH IDENTIFIER;
-PARAMETER: DOLLAR IDENTIFIER;
+PARAM_OR_VAR: DOLLAR IDENTIFIER;
+BLOCK_VAR: AT IDENTIFIER;
 
 UNSIGNED_NUMBER_LITERAL:
     DIGIT+
@@ -84,6 +84,9 @@ STRING_LITERAL:
     DOUBLE_QUOTE_STRING
     | SINGLE_QUOTE_STRING
 ;
+
+SQL_KEYWORDS: SELECT_ | INSERT_ | UPDATE_ | DELETE_ | WITH_;
+SQL_STMT: SQL_KEYWORDS WSNL+ ~[;}]+;
 
 WS:            [ \t]        -> channel(HIDDEN);
 TERMINATOR:    [\r\n]       -> channel(HIDDEN);
@@ -100,37 +103,3 @@ fragment SINGLE_QUOTE_STRING_CHAR: ~['\r\n\\] | ('\\' .);
 fragment DOUBLE_QUOTE_STRING: '"' DOUBLE_QUOTE_STRING_CHAR* '"';
 fragment SINGLE_QUOTE_STRING: '\'' SINGLE_QUOTE_STRING_CHAR* '\'';
 
-
-// ----------------- ACTION_MODE -----------------
-mode ACTION_MODE;
-ACTION_CLOSE: R_BRACE -> mode(DEFAULT_MODE);
-
-EQ:         '=';
-PLUS:       '+';
-PERIOD:     '.';
-A_COMMA:    COMMA;
-A_DOLLAR:   DOLLAR;
-A_AT:       '@';
-A_L_PAREN:  L_PAREN;
-A_R_PAREN:  R_PAREN;
-A_STMT_END: SCOL;
-
-SQL_KEYWORDS: SELECT_ | INSERT_ | UPDATE_ | DELETE_ | WITH_;
-
-A_IDENTIFIER: IDENTIFIER;
-A_VARIABLE: A_DOLLAR A_IDENTIFIER;
-A_REF: A_AT A_IDENTIFIER;
-A_UNSIGNED_NUMBER_LITERAL: UNSIGNED_NUMBER_LITERAL;
-A_SIGNED_NUMBER_LITERAL: SIGNED_NUMBER_LITERAL;
-A_STRING_LITERAL: STRING_LITERAL;
-
-// we only need sql statement as a whole, sql-parser will parse it
-A_SQL_STMT: SQL_KEYWORDS ~[;}]+;
-
-A_WS:            WS -> channel(HIDDEN);
-A_TERMINATOR:    TERMINATOR -> channel(HIDDEN);
-A_BLOCK_COMMENT: BLOCK_COMMENT -> channel(HIDDEN);
-A_LINE_COMMENT:  LINE_COMMENT -> channel(HIDDEN);
-
-// if not enforce syntax on call stmt, use this for action_stmt instead
-//ACTION_STMT: ~[;}]+;
