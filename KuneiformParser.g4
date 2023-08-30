@@ -52,6 +52,7 @@ column_def_list:
 column_type:
     INT_
     | TEXT_
+    | BLOB_
 ;
 
 column_constraint:
