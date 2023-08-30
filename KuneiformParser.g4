@@ -202,7 +202,7 @@ block_var:
 ;
 
 ext_call_name:
-    IDENTIFIER (PERIOD IDENTIFIER)?
+    IDENTIFIER PERIOD IDENTIFIER
 ;
 
 callee_name:
