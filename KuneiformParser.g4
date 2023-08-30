@@ -20,7 +20,7 @@ database_directive: DATABASE_ database_name;
 extension_directive:
     USE_ extension_name
     (L_BRACE ext_config_list R_BRACE)?
-    (AS_ extension_name)?
+    AS_ extension_name
     SCOL
 ;
 
