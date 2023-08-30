@@ -34,6 +34,7 @@ OWNER_:    'owner';
 //// column type
 INT_:      'int';
 TEXT_:     'text';
+BLOB_:     'blob';
 //// column attrs
 MIN_:      'min';
 MAX_:      'max';
