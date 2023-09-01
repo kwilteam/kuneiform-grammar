@@ -83,8 +83,7 @@ SIGNED_NUMBER_LITERAL:
 ;
 
 STRING_LITERAL:
-    DOUBLE_QUOTE_STRING
-    | SINGLE_QUOTE_STRING
+    SINGLE_QUOTE_STRING
 ;
 
 SQL_KEYWORDS: SELECT_ | INSERT_ | UPDATE_ | DELETE_ | WITH_;
@@ -99,9 +98,9 @@ LINE_COMMENT:  '//' ~[\r\n]* -> channel(HIDDEN);
 fragment WSNL: [ \t\r\n]; // whitespace with new line
 fragment DIGIT: [0-9];
 
-fragment DOUBLE_QUOTE_STRING_CHAR: ~["\r\n\\] | ('\\' .);
+//fragment DOUBLE_QUOTE_STRING_CHAR: ~["\r\n\\] | ('\\' .);
 fragment SINGLE_QUOTE_STRING_CHAR: ~['\r\n\\] | ('\\' .);
 
-fragment DOUBLE_QUOTE_STRING: '"' DOUBLE_QUOTE_STRING_CHAR* '"';
+//fragment DOUBLE_QUOTE_STRING: '"' DOUBLE_QUOTE_STRING_CHAR* '"';
 fragment SINGLE_QUOTE_STRING: '\'' SINGLE_QUOTE_STRING_CHAR* '\'';
 
