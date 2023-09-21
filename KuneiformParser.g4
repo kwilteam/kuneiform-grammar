@@ -193,6 +193,19 @@ sql_stmt:
     SQL_STMT SCOL
 ;
 
+call_stmt:
+    (call_receivers EQ)?
+    call_body SCOL
+;
+
+call_receivers:
+    variable (COMMA variable)*
+;
+
+call_body:
+    fn_name L_PAREN fn_arg_list R_PAREN
+;
+
 variable:
     PARAM_OR_VAR
 ;
@@ -201,34 +214,51 @@ block_var:
     BLOCK_VAR
 ;
 
-ext_call_name:
+extension_call_name:
     IDENTIFIER PERIOD IDENTIFIER
 ;
 
-callee_name:
-    ext_call_name
+//external_action_name:
+//    IDENTIFIER PERIOD IDENTIFIER
+//;
+
+// function name
+fn_name:
+    extension_call_name
     | action_name
+//    | external_action_name
 ;
 
-call_receivers:
-    variable (COMMA variable)*
+// (inside action) scalar function name
+sfn_name:
+    IDENTIFIER
 ;
 
-call_stmt:
-    (call_receivers EQ)?
-    call_body SCOL
-;
-
-call_body:
-    callee_name L_PAREN fn_arg_list R_PAREN
-;
+//fn_arg:
+//    literal_value
+//    | variable
+//    | block_var
+//;
 
 fn_arg_list:
-    fn_arg? (COMMA fn_arg)*
+//    fn_arg? (COMMA fn_arg)*
+    fn_arg_expr? (COMMA fn_arg_expr)*
 ;
 
-fn_arg:
+// NOTE: this will only be used inside fn_arg_list
+// precedence: highest to lowest
+fn_arg_expr:
     literal_value
     | variable
     | block_var
+    | sfn_name L_PAREN fn_arg_expr? (COMMA fn_arg_expr)* R_PAREN
 ;
+
+// future expr, replace whole `call_body`
+//expr:
+//    literal_value
+//    | variable_name
+//    | L_PAREN elevate_expr=expr R_PAREN
+//    | expr PLUS expr
+//    | function_name L_PAREN expr? (COMMA expr)* R_PAREN
+//;
