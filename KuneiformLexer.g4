@@ -17,7 +17,29 @@ DOLLAR:    '$';
 HASH:      '#';
 AT:        '@';
 PERIOD:    '.';
-EQ:        '=';
+ASSIGN:    '=';
+//// sql scalar function expressions symbols
+//// probably a different Lexical mode is a good idea
+PLUS:      '+';
+MINUS:     '-';
+STAR:      '*';
+DIV:       '/';
+MOD:       '%';
+TILDE:     '~';
+PIPE2:     '||';
+LT2:       '<<';
+GT2:       '>>';
+AMP:       '&';
+PIPE:      '|';
+EQ:        '==';
+LT:        '<';
+LT_EQ:     '<=';
+GT:        '>';
+GT_EQ:     '>=';
+SQL_NOT_EQ1: '!=';
+SQL_NOT_EQ2: '<>';
+////
+
 
 // keywords
 DATABASE_: 'database';
@@ -58,12 +80,18 @@ ACTION_DO_CASCADE_:     'cascade';
 ACTION_DO_SET_NULL_:    'set_null';
 ACTION_DO_SET_DEFAULT_: 'set_default';
 ACTION_DO_RESTRICT_:    'restrict';
-// sql keywords (make it top level keywords)
+//// sql keywords (make it top level keywords)
 SELECT_:   [sS][eE][lL][eE][cC][tT];
 INSERT_:   [iI][nN][sS][eE][rR][tT];
 UPDATE_:   [uU][pP][dD][aA][tT][eE];
 DELETE_:   [dD][eE][lL][eE][tT][eE];
 WITH_:     [wW][iI][tT][hH]        ;
+//// scalar functions expressions keyworkds
+//// probably a different Lexical mode is a good idea
+NOT_: 'not';
+AND_: 'and';
+OR_:  'or';
+////
 
 // literals
 IDENTIFIER:
