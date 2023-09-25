@@ -275,8 +275,6 @@ fn_arg_expr:
     | NOT_ unary_expr=fn_arg_expr
     | fn_arg_expr AND_ fn_arg_expr
     | fn_arg_expr OR_ fn_arg_expr
-    //
-    | L_PAREN expr_list+=fn_arg_expr (COMMA expr_list+=fn_arg_expr)* R_PAREN
     // scalar functions
     | sfn_name L_PAREN ( (fn_arg_expr (COMMA fn_arg_expr)*) | STAR )? R_PAREN
 ;
