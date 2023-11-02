@@ -123,8 +123,7 @@ action_mutability:
 ;
 
 action_auxiliary:
-    MUSTSIGN_
-    | OWNER_
+    OWNER_
 ;
 
 action_attr_list:
