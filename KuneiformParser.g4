@@ -32,6 +32,19 @@ ext_config:
     ext_config_name COL ext_config_value
 ;
 
+annotation_decl:
+    annotation_target_name
+    L_PAREN annotation_attr_list R_PAREN
+;
+
+annotation_attr_list:
+    annotation_attr (COMMA annotation_attr)*
+;
+
+annotation_attr:
+    annotation_attr_name ASSIGN annotation_attr_value
+;
+
 table_decl:
     TABLE_ table_name
     L_BRACE
@@ -119,6 +132,7 @@ action_attr_list:
 ;
 
 action_decl:
+    annotation_decl*
     ACTION_ action_name
     L_PAREN param_list R_PAREN
     action_attr_list
@@ -167,6 +181,18 @@ index_name:
     INDEX_NAME
 ;
 
+annotation_target_name:
+    BLOCK_VAR_OR_ANNOTATION
+;
+
+annotation_attr_name:
+    IDENTIFIER
+;
+
+annotation_attr_value:
+    literal_value
+;
+
 ext_config_value:
     literal_value
 ;
@@ -211,7 +237,7 @@ variable:
 ;
 
 block_var:
-    BLOCK_VAR
+    BLOCK_VAR_OR_ANNOTATION
 ;
 
 extension_call_name:
