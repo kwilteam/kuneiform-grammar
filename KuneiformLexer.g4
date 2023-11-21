@@ -51,7 +51,6 @@ INIT_:     'init';
 PUBLIC_:   'public';
 PRIVATE_:  'private';
 VIEW_:     'view';
-MUSTSIGN_: 'mustsign';
 OWNER_:    'owner';
 //// column type
 INT_:      'int';
