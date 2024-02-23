@@ -3,7 +3,7 @@
 
 go.mod
 
-antlr-4.12.0-complete.jar
+antlr-4.*?-complete.jar
 gen/
 *.go
 *.interp
